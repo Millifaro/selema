@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selema - Вход</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="logo-small">
+                <svg width="80" height="80" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="55" fill="#2AABEE"/>
+                    <path d="M30 60 L50 70 L70 40 L90 60" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            
+            <h2 id="auth-title">Вход в Selema</h2>
+            <p class="auth-subtitle" id="auth-subtitle">Введите ваш номер телефона</p>
+            
+            <div id="phone-step" class="auth-step active">
+                <input type="tel" id="phone" placeholder="+7 (___) ___-__-__">
+                <button type="button" class="btn-primary" onclick="handlePhoneSubmit()">Далее</button>
+            </div>
+            
+            <div id="code-step" class="auth-step">
+                <input type="text" id="code" placeholder="Код подтверждения" maxlength="6">
+                <button type="button" class="btn-primary" onclick="verifyCode()">Подтвердить</button>
+                <button type="button" class="btn-text" onclick="backToPhone()">Изменить номер</button>
+            </div>
+            
+            <div id="profile-step" class="auth-step">
+                <input type="text" id="firstName" placeholder="Имя">
+                <input type="text" id="lastName" placeholder="Фамилия (необязательно)">
+                <input type="text" id="username" placeholder="@username" maxlength="32">
+                <p class="input-hint">Username нужен для поиска друзей</p>
+                <button type="button" class="btn-primary" onclick="completeRegistration()">Готово</button>
+            </div>
+            
+            <p class="auth-footer">Нажимая "Далее", вы принимаете условия использования</p>
+        </div>
+    </div>
+    
+    <script src="js/auth.js"></script>
+</body>
+</html>
