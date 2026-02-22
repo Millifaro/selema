@@ -17,28 +17,27 @@
             </div>
             
             <h2 id="auth-title">Вход в Selema</h2>
-            <p class="auth-subtitle" id="auth-subtitle">Введите ваш номер телефона</p>
+            <p class="auth-subtitle" id="auth-subtitle">Войдите или создайте аккаунт</p>
             
-            <div id="phone-step" class="auth-step active">
-                <input type="tel" id="phone" placeholder="+7 (___) ___-__-__">
-                <button type="button" class="btn-primary" onclick="handlePhoneSubmit()">Далее</button>
+            <div id="login-step" class="auth-step active">
+                <input type="text" id="login-username" placeholder="@username">
+                <input type="password" id="login-password" placeholder="Пароль">
+                <button type="button" class="btn-primary" onclick="handleLogin()">Войти</button>
+                <button type="button" class="btn-text" onclick="showRegister()">Создать аккаунт</button>
             </div>
             
-            <div id="code-step" class="auth-step">
-                <input type="text" id="code" placeholder="Код подтверждения" maxlength="6">
-                <button type="button" class="btn-primary" onclick="verifyCode()">Подтвердить</button>
-                <button type="button" class="btn-text" onclick="backToPhone()">Изменить номер</button>
-            </div>
-            
-            <div id="profile-step" class="auth-step">
-                <input type="text" id="firstName" placeholder="Имя">
-                <input type="text" id="lastName" placeholder="Фамилия (необязательно)">
-                <input type="text" id="username" placeholder="@username" maxlength="32">
+            <div id="register-step" class="auth-step">
+                <input type="text" id="reg-firstname" placeholder="Имя">
+                <input type="text" id="reg-lastname" placeholder="Фамилия (необязательно)">
+                <input type="text" id="reg-username" placeholder="@username" maxlength="32">
                 <p class="input-hint">Username нужен для поиска друзей</p>
-                <button type="button" class="btn-primary" onclick="completeRegistration()">Готово</button>
+                <input type="password" id="reg-password" placeholder="Пароль (минимум 6 символов)">
+                <input type="password" id="reg-password-confirm" placeholder="Повторите пароль">
+                <button type="button" class="btn-primary" onclick="handleRegister()">Зарегистрироваться</button>
+                <button type="button" class="btn-text" onclick="showLogin()">Уже есть аккаунт</button>
             </div>
             
-            <p class="auth-footer">Нажимая "Далее", вы принимаете условия использования</p>
+            <p class="auth-footer">Нажимая кнопку, вы принимаете условия использования</p>
         </div>
     </div>
     

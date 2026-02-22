@@ -14,17 +14,27 @@ window.addEventListener('DOMContentLoaded', () => {
     
     currentUser = JSON.parse(userStr);
     
+    // Проверяем, что пользователь существует в базе
+    const users = JSON.parse(localStorage.getItem('selema_users') || '{}');
+    if (!users[currentUser.id]) {
+        users[currentUser.id] = currentUser;
+        localStorage.setItem('selema_users', JSON.stringify(users));
+    }
+    
     // Загружаем данные
     loadChats();
     loadMessages();
     updateUserInfo();
     renderChats();
+    
+    // Проверяем новые сообщения каждые 2 секунды
+    setInterval(checkNewMessages, 2000);
 });
 
 function updateUserInfo() {
     document.getElementById('user-name').textContent = 
         `${currentUser.firstName} ${currentUser.lastName || ''}`.trim();
-    document.getElementById('user-phone').textContent = currentUser.phone;
+    document.getElementById('user-phone').textContent = '@' + currentUser.username;
 }
 
 function loadChats() {
@@ -60,33 +70,43 @@ function saveChats() {
 }
 
 function loadMessages() {
-    const savedMessages = localStorage.getItem('selema_messages_' + currentUser.id);
-    if (savedMessages) {
-        messages = JSON.parse(savedMessages);
-    } else {
-        // Демо-сообщения
-        messages = {
-            '2': [
-                {
-                    id: '1',
-                    text: 'Добро пожаловать в Selema! 👋',
-                    time: '10:15',
-                    type: 'in'
-                },
-                {
-                    id: '2',
-                    text: 'Здесь вы можете общаться с друзьями и близкими.',
-                    time: '10:15',
-                    type: 'in'
-                }
-            ]
-        };
-        saveMessages();
-    }
+    // Загружаем глобальные сообщения (общие для всех)
+    const globalMessages = JSON.parse(localStorage.getItem('selema_global_messages') || '{}');
+    messages = globalMessages;
 }
 
 function saveMessages() {
-    localStorage.setItem('selema_messages_' + currentUser.id, JSON.stringify(messages));
+    // Сохраняем в глобальное хранилище
+    localStorage.setItem('selema_global_messages', JSON.stringify(messages));
+}
+
+function checkNewMessages() {
+    // Проверяем новые сообщения из глобального хранилища
+    const globalMessages = JSON.parse(localStorage.getItem('selema_global_messages') || '{}');
+    
+    // Обновляем чаты если есть новые сообщения
+    Object.keys(globalMessages).forEach(chatId => {
+        const chatMessages = globalMessages[chatId];
+        const localMessages = messages[chatId] || [];
+        
+        if (chatMessages.length > localMessages.length) {
+            messages[chatId] = chatMessages;
+            
+            // Обновляем список чатов
+            const chat = chats.find(c => c.id === chatId);
+            if (chat) {
+                const lastMsg = chatMessages[chatMessages.length - 1];
+                chat.lastMessage = lastMsg.text;
+                chat.time = lastMsg.time;
+                renderChats();
+            }
+            
+            // Если это текущий чат, обновляем сообщения
+            if (currentChat && currentChat.id === chatId) {
+                renderMessages();
+            }
+        }
+    });
 }
 
 function renderChats() {
@@ -137,8 +157,10 @@ function renderMessages() {
     }
     
     chatMessages.forEach(msg => {
+        // Определяем тип сообщения (входящее или исходящее)
+        const isMyMessage = msg.senderId === currentUser.id;
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${msg.type}`;
+        messageDiv.className = `message ${isMyMessage ? 'out' : 'in'}`;
         messageDiv.innerHTML = `
             <div>${msg.text}</div>
             <div class="message-time">${msg.time}</div>
@@ -167,7 +189,9 @@ function sendMessage() {
         id: Date.now().toString(),
         text: text,
         time: time,
-        type: 'out'
+        type: 'out',
+        senderId: currentUser.id,
+        senderName: currentUser.firstName
     };
     
     if (!messages[currentChat.id]) {
@@ -318,6 +342,10 @@ function createNewGroup() {
 function showContacts() {
     toggleMenu();
     const users = JSON.parse(localStorage.getItem('selema_users') || '{}');
+    
+    console.log('Показ контактов. Все пользователи:', users);
+    console.log('Текущий пользователь ID:', currentUser.id);
+    
     const userList = Object.values(users)
         .filter(u => u.id !== currentUser.id)
         .map(u => `@${u.username} - ${u.firstName} ${u.lastName || ''}`)
@@ -326,7 +354,7 @@ function showContacts() {
     if (userList) {
         alert('Контакты:\n\n' + userList);
     } else {
-        alert('У вас пока нет контактов');
+        alert('У вас пока нет контактов.\n\nВсего пользователей в системе: ' + Object.keys(users).length);
     }
 }
 
@@ -349,7 +377,6 @@ function showSettings() {
 
 Имя: ${currentUser.firstName} ${currentUser.lastName || ''}
 Username: @${currentUser.username}
-Телефон: ${currentUser.phone}
 ID: ${currentUser.id}
 
 Дата регистрации: ${new Date(currentUser.createdAt).toLocaleDateString('ru-RU')}`;
