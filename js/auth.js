@@ -78,7 +78,7 @@ function completeRegistration() {
     
     // Проверяем уникальность username
     const users = JSON.parse(localStorage.getItem('selema_users') || '{}');
-    const usernameExists = Object.values(users).some(u => u.username === username);
+    const usernameExists = Object.values(users).some(u => u.username && u.username.toLowerCase() === username.toLowerCase());
     
     if (usernameExists) {
         alert('Этот username уже занят. Выберите другой.');
@@ -98,6 +98,8 @@ function completeRegistration() {
     // Сохраняем пользователя
     users[phoneNumber] = user;
     localStorage.setItem('selema_users', JSON.stringify(users));
+    
+    // Создаем отдельное хранилище для каждого пользователя
     localStorage.setItem('selema_current_user', JSON.stringify(user));
     
     // Переходим в приложение

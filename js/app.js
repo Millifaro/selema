@@ -364,9 +364,14 @@ function searchUsers() {
     const searchQuery = query.trim().replace('@', '').toLowerCase();
     const users = JSON.parse(localStorage.getItem('selema_users') || '{}');
     
+    console.log('Поиск:', searchQuery);
+    console.log('Все пользователи:', users);
+    
     const found = Object.values(users).find(u => 
-        u.username.toLowerCase() === searchQuery && u.id !== currentUser.id
+        u.username && u.username.toLowerCase() === searchQuery && u.id !== currentUser.id
     );
+    
+    console.log('Найден:', found);
     
     if (found) {
         const result = confirm(`Найден пользователь:\n\n${found.firstName} ${found.lastName || ''}\n@${found.username}\n\nНачать чат?`);
@@ -392,8 +397,14 @@ function searchUsers() {
             }
             
             openChat(existingChat);
+            toggleMenu();
         }
     } else {
-        alert('Пользователь не найден');
+        const allUsernames = Object.values(users)
+            .filter(u => u.id !== currentUser.id)
+            .map(u => '@' + u.username)
+            .join(', ');
+        
+        alert(`Пользователь @${searchQuery} не найден\n\nДоступные пользователи:\n${allUsernames || 'Нет других пользователей'}`);
     }
 }
